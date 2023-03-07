@@ -1,0 +1,127 @@
+#!/usr/bin/env ruby
+
+# J get-directory helper
+# Authour: lumiknit (aasr4r4@gmail.com)
+# Version: 0.0.1 (230307)
+
+$home = ENV['J_HOME']
+$bases = ENV['J_BASES'].split(':')
+
+def fast_access_directories
+  # get home environment
+  ignores = [
+    '__pycache__',
+    'bin',
+    'build',
+    'config',
+    'configs',
+    'coverage',
+    'dist',
+    'doc',
+    'docs',
+    'include',
+    'includes',
+    'lib',
+    'libs',
+    'log',
+    'module',
+    'modules',
+    'node_modules',
+    'out',
+    'src',
+    'srcs',
+    'target',
+    'test',
+    'tests',
+    'tmp',
+    'vendor',
+    'vscode',
+  ]
+  ignore_map = {}
+  ignores.each do |i|
+    ignore_map[i] = true
+  end
+
+  directories = []
+
+  def gather_directories root, base, dirs, ignore_map
+    # Check if the directory is repo
+    dirs << { path: base, name: base.delete_prefix(root) }
+    return if File.exist?("#{base}/.git")
+    # Otherwise, scan all subdirectories
+    Dir.glob("#{base}/*").each do |d|
+      next unless File.directory?(d)
+      # Ignore directories in ignore list
+      next if File.basename(d)[0] == '.'
+      next if ignore_map[File.basename(d)]
+      # Otherwise push and search recursively
+      gather_directories root, d, dirs, ignore_map
+    end
+  end
+
+  $bases.each do |base|
+    gather_directories base, base, directories, ignore_map
+  end
+
+  directories
+end
+
+# Get argument
+find_name = ARGV[0]
+if find_name == nil || find_name == ''
+  puts "Usage: -J-getdir <name>"
+  exit 1
+end
+
+def distance a, b
+  # Weighted editing distance
+  deletion_cost = 1.0
+  insertion_cost = 40.0
+  substitution_cost = 30.0
+  case_change_cost = 0.2
+  d = ([nil] * (a.length + 1)).map { [nil] * (b.length + 1) }
+  (0..a.length).each { |i| d[i][0] = i * deletion_cost }
+  (0..b.length).each { |j| d[0][j] = j * insertion_cost }
+  (1..b.length).each do |j|
+    (1..a.length).each do |i|
+      new_values = [
+        d[i - 1][j] + deletion_cost, # deletion
+        d[i][j - 1] + insertion_cost, # insertion
+        d[i - 1][j - 1] + substitution_cost, # substitution
+      ]
+      if a[i - 1] == b[j - 1]
+        new_values << d[i - 1][j - 1]
+      elsif a[i - 1].downcase == b[j - 1].downcase
+        new_values << d[i - 1][j - 1] + case_change_cost
+      end
+      d[i][j] = new_values.min
+    end
+  end
+  d[a.length][b.length]
+end
+
+directories = fast_access_directories
+
+found = []
+directories.each do |d|
+  name = d[:name]
+  dist = distance name, find_name
+  found << {
+    name: d[:name],
+    path: d[:path],
+    dist: dist,
+  }
+end
+
+# Sort by parts
+found.sort! do |a, b|
+  if a[:dist] != b[:dist]
+    a[:dist] <=> b[:dist] 
+  else
+    a[:name].length <=> b[:name].length
+  end
+end
+
+found.each do |f|
+  puts "#{f[:path]}"
+end

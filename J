@@ -1,0 +1,129 @@
+#!/bin/sh
+
+# lumiknit's jump helper
+# Authour: lumiknit (aasr4r4@gmail.com)
+# Version: 0.0.1 (230307)
+
+export J_HOME="$HOME"
+export J_REPOS="$HOME/repos"
+export J_BASES="$HOME/repos:$HOME/workspace"
+
+J() {
+    arg="$2$3$4$5$6$7$8$9$10$11$12$13$14$15$16$17$18$19$20"
+    # switch by commands
+    case "$1" in
+        cd|c)
+            dirs=($(-J-getdir "$arg"))
+            if [ ${#dirs[@]} -eq 0 ]; then
+                echo "J ERR: Cannot find the path '$arg'!"
+            elif [ ${#dirs[@]} -eq 1 ]; then
+                echo "J: cd to ${dirs[1]}"
+                cd "${dirs[1]}"
+            else
+                # Print first 8 matches
+                echo "J: Top 8 matches of ${#dirs[@]} ones for '$arg'!"
+                for dir in "${dirs[@]:0:8}"; do
+                    echo "  $dir"
+                done
+                # Print more matches if there are more than 8
+                if [ ${#dirs[@]} -gt 8 ]; then
+                    echo "  ..."
+                fi
+                # Go to the first match
+                echo "J: cd to ${dirs[1]}"
+                cd "${dirs[1]}"
+            fi
+            ;;
+        pushd|p)
+            dirs=($(-J-getdir "$arg"))
+            if [ ${#dirs[@]} -eq 0 ]; then
+                echo "J ERR: Cannot find the path '$arg'!"
+            elif [ ${#dirs[@]} -eq 1 ]; then
+                echo "J: pushd to ${dirs[1]}"
+                pushd "${dirs[1]}"
+            else
+                # Print first 8 matches
+                echo "J: Top 8 matches of ${#dirs[@]} ones for '$arg'!"
+                for dir in "${dirs[@]:0:8}"; do
+                    echo "  $dir"
+                done
+                # Print more matches if there are more than 8
+                if [ ${#dirs[@]} -gt 8 ]; then
+                    echo "  ..."
+                fi
+                # Go to the first match
+                echo "J: pushd to ${dirs[1]}"
+                pushd "${dirs[1]}"
+            fi
+            ;;
+        code|vscode|v)
+            dirs=($(-J-getdir "$arg"))
+            if [ ${#dirs[@]} -eq 0 ]; then
+                echo "J ERR: Cannot find the path '$arg'!"
+            elif [ ${#dirs[@]} -eq 1 ]; then
+                echo "J: open ${dirs[1]} in vscode"
+                code "${dirs[1]}"
+            else
+                # Print first 8 matches
+                echo "J: Top 8 matches of ${#dirs[@]} ones for '$arg'!"
+                for dir in "${dirs[@]:0:8}"; do
+                    echo "  $dir"
+                done
+                # Print more matches if there are more than 8
+                if [ ${#dirs[@]} -gt 8 ]; then
+                    echo "  ..."
+                fi
+                # Go to the first match
+                echo "J: open ${dirs[1]} in vscode"
+                code "${dirs[1]}"
+            fi
+            ;;
+        emacs|e)
+            dirs=($(-J-getdir "$arg"))
+            if [ ${#dirs[@]} -eq 0 ]; then
+                echo "J ERR: Cannot find the path '$arg'!"
+            elif [ ${#dirs[@]} -eq 1 ]; then
+                echo "J: open ${dirs[1]} in emacs"
+                open -a emacs "${dirs[1]}"
+            else
+                # Print first 8 matches
+                echo "J: Top 8 matches of ${#dirs[@]} ones for '$arg'!"
+                for dir in "${dirs[@]:0:8}"; do
+                    echo "  $dir"
+                done
+                # Print more matches if there are more than 8
+                if [ ${#dirs[@]} -gt 8 ]; then
+                    echo "  ..."
+                fi
+                # Go to the first match
+                echo "J: open ${dirs[1]} in emacs"
+                open -a emacs "${dirs[1]}"
+            fi
+            ;;
+        clone|cl1|1)
+            -J-clone "$arg"
+            ;;
+        *)
+            # Show version
+            echo "J - lumiknit's jump helper"
+            echo "Usage: J <COMMAND> <PATH>"
+            echo "Commands:"
+            echo "  cd,c               - cd to the path"
+            echo "  pushd,p            - pushd to the path"
+            echo "  code,vscode,v      - open the path in vscode"
+            echo "  emacs,e            - open the path in emacs"
+            echo "  clone,cl1,1        - clone the path"
+            echo "  help,*             - show this help"
+            ;;
+    esac
+}
+
+j() {
+    if [ $# -eq 0 ]; then
+        echo "j - lumiknit's jump helper"
+        echo "Usage: j <PATH>"
+        echo "Note: j is just an alias of 'J cd'"
+    else
+        J cd "$1$2$3$4$5$6$7$8$9$10$11$12$13$14$15$16$17$18$19$20"
+    fi
+}
