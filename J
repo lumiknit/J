@@ -2,7 +2,7 @@
 
 # lumiknit's jump helper
 # Authour: lumiknit (aasr4r4@gmail.com)
-# Version: 0.0.1 (230307)
+# Version: 0.0.2 (230307)
 
 export J_HOME="$HOME"
 export J_REPOS="$HOME/repos"
@@ -13,7 +13,7 @@ J() {
     # switch by commands
     case "$1" in
         cd|c)
-            dirs=($(-J-getdir "$arg"))
+            dirs=($(_J_tool find "$arg"))
             if [ ${#dirs[@]} -eq 0 ]; then
                 echo "J ERR: Cannot find the path '$arg'!"
             elif [ ${#dirs[@]} -eq 1 ]; then
@@ -35,7 +35,7 @@ J() {
             fi
             ;;
         pushd|p)
-            dirs=($(-J-getdir "$arg"))
+            dirs=($(_J_tool find "$arg"))
             if [ ${#dirs[@]} -eq 0 ]; then
                 echo "J ERR: Cannot find the path '$arg'!"
             elif [ ${#dirs[@]} -eq 1 ]; then
@@ -57,7 +57,7 @@ J() {
             fi
             ;;
         code|vscode|v)
-            dirs=($(-J-getdir "$arg"))
+            dirs=($(_J_tool find "$arg"))
             if [ ${#dirs[@]} -eq 0 ]; then
                 echo "J ERR: Cannot find the path '$arg'!"
             elif [ ${#dirs[@]} -eq 1 ]; then
@@ -79,7 +79,7 @@ J() {
             fi
             ;;
         emacs|e)
-            dirs=($(-J-getdir "$arg"))
+            dirs=($(_J_tool find "$arg"))
             if [ ${#dirs[@]} -eq 0 ]; then
                 echo "J ERR: Cannot find the path '$arg'!"
             elif [ ${#dirs[@]} -eq 1 ]; then
@@ -100,8 +100,30 @@ J() {
                 open -a emacs "${dirs[1]}"
             fi
             ;;
+        open|o)
+            dirs=($(_J_tool find "$arg"))
+            if [ ${#dirs[@]} -eq 0 ]; then
+                echo "J ERR: Cannot find the path '$arg'!"
+            elif [ ${#dirs[@]} -eq 1 ]; then
+                echo "J: open ${dirs[1]} in emacs"
+                open "${dirs[1]}"
+            else
+                # Print first 8 matches
+                echo "J: Top 8 matches of ${#dirs[@]} ones for '$arg'!"
+                for dir in "${dirs[@]:0:8}"; do
+                    echo "  $dir"
+                done
+                # Print more matches if there are more than 8
+                if [ ${#dirs[@]} -gt 8 ]; then
+                    echo "  ..."
+                fi
+                # Go to the first match
+                echo "J: open ${dirs[1]} in emacs"
+                open "${dirs[1]}"
+            fi
+            ;;
         clone|cl1|1)
-            -J-clone "$arg"
+            _J_tool clone "$arg"
             ;;
         *)
             # Show version
@@ -112,6 +134,7 @@ J() {
             echo "  pushd,p            - pushd to the path"
             echo "  code,vscode,v      - open the path in vscode"
             echo "  emacs,e            - open the path in emacs"
+            echo "  open,o             - open the path using open"
             echo "  clone,cl1,1        - clone the path"
             echo "  help,*             - show this help"
             ;;

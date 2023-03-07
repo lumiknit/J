@@ -4,19 +4,9 @@ My jump helper in shell
 
 ## Installation
 
-Dependency: sh, ruby
+Dependency: sh, rust
 
-1. Clone this repository
-2. Copy `-J-clone` and `-J-getdir` in some good directory, which of the path specified in `$PATH` ENV.
-   - e.g. Put in `~/.local/bin` and put `export PATH="$PATH:$HOME/.local/bin` in your shell profile (`.bashrc`, `.zshrc`, etc.).
-3. Copy `J` in some good directory.
-4. Put `source /path/to/J` in your shell profile.
-5. If you want to change the search directory, put below codes **after `source /path/to/J`** in your shell profile too! (Or, modify `J`)
-   ```sh
-   export J_HOME="$HOME"  # Your home directory
-   export J_REPOS="$HOME/repos"  # Your repos directory
-   export J_BASES="$HOME/repos:$HOME/workspaces"  # colon-separated directories to be searched
-   ```
+Run `sh ./install.sh`.
 
 ## Usage
 
@@ -30,11 +20,13 @@ Commands:
   pushd,p            - pushd to the path
   code,vscode,v      - open the path in vscode
   emacs,e            - open the path in emacs
+  open,o             - open the path using open
   clone,cl1,1        - clone the path
   help,*             - show this help
 ```
 
 Examples:
+
 ```sh
 J cd hello world     # Fuzzy find hello world and go to best match
 J c hello world      # Same one
