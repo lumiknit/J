@@ -2,14 +2,16 @@
 
 # lumiknit's jump helper
 # Authour: lumiknit (aasr4r4@gmail.com)
-# Version: 0.0.2 (230307)
+# Version: 0.0.3 (230811)
 
 export J_HOME="$HOME"
 export J_REPOS="$HOME/repos"
 export J_BASES="$HOME/repos:$HOME/workspace"
+export J_SANDBOX="$HOME/workspace/sandbox"
 
 J() {
-    arg="$2$3$4$5$6$7$8$9$10$11$12$13$14$15$16$17$18$19$20"
+    # Extract all arguments from the seconds one.
+    arg="${@:2}"
     # switch by commands
     case "$1" in
         cd|c)
@@ -125,6 +127,29 @@ J() {
         clone|cl1|1)
             _J_tool clone "$arg"
             ;;
+        sandbox|s|0)
+            case "$2" in
+                help|--help|-h)
+                    echo "J sandbox help"
+                    echo "Usage: J sandbox [{<COMMAND>, <NAME>}]"
+                    echo "  If no command is given, jump to the sandbox."
+                    echo "  If name is not given, it'll use random name"
+                    echo "Commands:"
+                    echo "  help,--help,-h     - show this help"
+                    ;;
+                *)
+                    name="$2"
+                    if [ -z "$name" ]; then
+                        date="$(date +%y%m%d)"
+                        rand="$(cat /dev/random | head -c 6 | base64 | tr '[:upper:]' '[:lower:]' | sed -e 's/[^0-9a-z]/_/g')"
+                        name="$date-$rand"
+                    fi
+                    echo "J: jump to sandbox $name"
+                    if [ ! -d "$HOME/sandbox/$name" ]; then
+                        mkdir -p "$HOME/sandbox/$name"
+                    fi
+                    cd "$HOME/sandbox/$name"
+            ;;
         *)
             # Show version
             echo "J - lumiknit's jump helper"
@@ -136,6 +161,7 @@ J() {
             echo "  emacs,e            - open the path in emacs"
             echo "  open,o             - open the path using open"
             echo "  clone,cl1,1        - clone the path"
+            echo "  sandbox,s,0        - jump to sandbox"
             echo "  help,*             - show this help"
             ;;
     esac
@@ -143,10 +169,9 @@ J() {
 
 j() {
     if [ $# -eq 0 ]; then
-        echo "j - lumiknit's jump helper"
-        echo "Usage: j <PATH>"
-        echo "Note: j is just an alias of 'J cd'"
+        # Jump to sandbox
+        J sandbox $@
     else
-        J cd "$1$2$3$4$5$6$7$8$9$10$11$12$13$14$15$16$17$18$19$20"
+        J cd $@
     fi
 }
