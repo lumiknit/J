@@ -149,6 +149,8 @@ J() {
                         mkdir -p "$HOME/sandbox/$name"
                     fi
                     cd "$HOME/sandbox/$name"
+                    ;;
+                esac
             ;;
         *)
             # Show version
