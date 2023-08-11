@@ -141,7 +141,7 @@ J() {
                     name="$2"
                     if [ -z "$name" ]; then
                         date="$(date +%y%m%d)"
-                        rand="$(cat /dev/random | head -c 6 | base64 | tr '[:upper:]' '[:lower:]' | sed -e 's/[^0-9a-z]/_/g')"
+                        rand="$(cat /dev/urandom | head -c 6 | base64 | tr '[:upper:]' '[:lower:]' | sed -e 's/[^0-9a-z]/_/g')"
                         name="$date-$rand"
                     fi
                     echo "J: jump to sandbox $name"
