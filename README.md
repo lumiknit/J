@@ -1,5 +1,7 @@
 # J
 
+--> https://github.com/lumiknit/J2
+
 My jump helper in shell
 
 ## Installation
